@@ -25,9 +25,11 @@ c = conn.cursor()
 # Extension Mismatch
 ext_mism_list = all_data["Results"]["Extension Mismatch Detected"]
 for row in c.execute( '''
-        select name, parent_path, mime_type, size, mtime, atime, crtime, ctime, md5, tsk_files.obj_id, artifact_id
-        from tsk_files inner join blackboard_artifacts on blackboard_artifacts.obj_id = tsk_files.obj_id 
-        where blackboard_artifacts.artifact_type_id = 34
+        select name, parent_path, mime_type, size, mtime, atime, crtime, 
+            ctime, md5, tsk_files.obj_id, artifact_id
+        from tsk_files inner join blackboard_artifacts using ( obj_id )
+			inner join blackboard_artifact_types using ( artifact_type_id )
+        where blackboard_artifact_types.type_name = 'TSK_EXT_MISMATCH_DETECTED'
         ''' ):
     ext_mism_list.append( {
         "visible_values": {
@@ -57,3 +59,6 @@ for row in c.execute( '''
             "Artifact ID":      row[10]
         }
     } )
+
+# Deleted Files
+del_files_list = all_data["Views"]["Deleted Files"]
